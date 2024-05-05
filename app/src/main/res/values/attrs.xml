@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="HexBoard">
+        <attr name="boardColor" format="color"/>
+        <attr name="playerOneColor" format="color"/>
+        <attr name="playerTwoColor" format="color"/>
+        <attr name="emptyCellColor" format="color"/>
+    </declare-styleable>
+</resources>
