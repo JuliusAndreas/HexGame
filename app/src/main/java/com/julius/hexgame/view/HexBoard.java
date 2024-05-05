@@ -2,6 +2,8 @@ package com.julius.hexgame.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +20,7 @@ public class HexBoard extends View {
     private final int playerOneColor;
     private final int playerTwoColor;
     private final int emptyCellColor;
+    private final Paint paint = new Paint();
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -40,5 +43,16 @@ public class HexBoard extends View {
         int dimension = Math.min(getMeasuredWidth(), getMeasuredHeight());
 
         setMeasuredDimension(dimension, dimension);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas){
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setAntiAlias(true);
+
+        drawGameBoard(canvas);
+    }
+
+    private void drawGameBoard(Canvas canvas) {
     }
 }
