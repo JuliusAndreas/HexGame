@@ -24,10 +24,12 @@ public class HexBoard extends View {
     private final Paint strokePaint = new Paint();
     private final Path path = new Path();
     private short supremum = 5;
-    private short hexagonRadius = (short) (getWidth() / supremum);
+    private short hexagonRadius;
     private short oddAreaHexagons;
     private short evenAreaHexagons;
     private short totalColumnsAndRows;
+    private short hexagonChunk;
+    private short hexagonHeight;
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -51,8 +53,10 @@ public class HexBoard extends View {
 
         setMeasuredDimension(dimension, dimension);
 
-        hexagonRadius = (short) (dimension / supremum);
-        totalColumnsAndRows = (short) (dimension / hexagonRadius);
+        hexagonChunk = (short) (dimension / supremum);
+        hexagonHeight = (short) (hexagonChunk - (hexagonChunk / 10));
+        hexagonRadius = (short) ((hexagonChunk - (hexagonHeight / 2)) / (Math.PI / 6));
+        totalColumnsAndRows = (short) (dimension / hexagonChunk);
     }
 
     @Override
@@ -93,11 +97,14 @@ public class HexBoard extends View {
 //        }
         for (int row = 0; row < totalColumnsAndRows; row++) {
             for (int col = 0; col < totalColumnsAndRows; col++) {
-                float x = col * hexagonRadius * 1.5f + hexagonRadius * 1.1f;
-                float y = row * hexagonRadius * 2f + (col % 2) * hexagonRadius + hexagonRadius;
-//                if (row == 0) {
-//                    x
-//                }
+                float x = col * hexagonRadius * 1.5f;
+                float y = row * hexagonRadius * 2f + (col % 2) * hexagonRadius;
+                if (row == 0) {
+                    x = hexagonRadius * 1.1f;
+                }
+                if (col == 0) {
+                    y = hexagonRadius;
+                }
 
                 drawHexagon(canvas, x, y);
             }
