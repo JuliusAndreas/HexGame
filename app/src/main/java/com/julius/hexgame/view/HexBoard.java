@@ -4,18 +4,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.julius.hexgame.R;
-
-import java.util.Arrays;
 
 public class HexBoard extends View {
 
@@ -26,11 +23,11 @@ public class HexBoard extends View {
     private final Paint paint = new Paint();
     private final Paint strokePaint = new Paint();
     private final Path path = new Path();
-    private short supremum = 11;
+    private short supremum = 5;
     private short hexagonRadius = (short) (getWidth() / supremum);
     private short oddAreaHexagons;
     private short evenAreaHexagons;
-    private short totalColumns;
+    private short totalColumnsAndRows;
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -55,14 +52,13 @@ public class HexBoard extends View {
         setMeasuredDimension(dimension, dimension);
 
         hexagonRadius = (short) (dimension / supremum);
-        oddAreaHexagons = (short) ((dimension / hexagonRadius) - 1);
-        evenAreaHexagons = (short) ((dimension / hexagonRadius) - 2);
-        totalColumns = (short) (dimension / hexagonRadius);
+        totalColumnsAndRows = (short) (dimension / hexagonRadius);
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        strokePaint.setStrokeWidth(6);
+    protected void onDraw(@NonNull Canvas canvas) {
+        strokePaint.setStrokeWidth(2);
+        strokePaint.setAntiAlias(true);
         strokePaint.setColor(Color.BLACK);
         strokePaint.setStyle(Paint.Style.STROKE);
 
@@ -84,22 +80,31 @@ public class HexBoard extends View {
 //        path.lineTo(400, 200);
 //        path.lineTo(300, 100);
 //        path.lineTo(400, 20);
-        canvas.drawPath(path, paint);
-        canvas.drawPath(path, strokePaint);
         drawGameBoard(canvas);
     }
 
     private void drawGameBoard(Canvas canvas) {
-        for (int i = 0; i < totalColumns; i++) {
-            if (i % 2 == 0) {
+//        for (int i = 0; i < totalColumns; i++) {
+//            if (i % 2 == 0) {
+//
+//            } else {
+//
+//            }
+//        }
+        for (int row = 0; row < totalColumnsAndRows; row++) {
+            for (int col = 0; col < totalColumnsAndRows; col++) {
+                float x = col * hexagonRadius * 1.5f + hexagonRadius * 1.1f;
+                float y = row * hexagonRadius * 2f + (col % 2) * hexagonRadius + hexagonRadius;
+//                if (row == 0) {
+//                    x
+//                }
 
-            } else {
-
+                drawHexagon(canvas, x, y);
             }
         }
     }
 
-    private void drawHexagon(float cx, float cy) {
+    private void drawHexagon(Canvas canvas, float cx, float cy) {
         // Calculate vertex positions
         for (int i = 0; i < 6; i++) {
             float angle = (float) (i * 2 * Math.PI / 6); // Angle for each vertex
@@ -113,5 +118,7 @@ public class HexBoard extends View {
             }
         }
         path.close();
+        canvas.drawPath(path, paint);
+        canvas.drawPath(path, strokePaint);
     }
 }
