@@ -36,6 +36,8 @@ public class HexBoard extends View {
     private short hexagonChunk;
     private float hexagonSize;
     private short hexagonHeight;
+    private float xOffset;
+    private float yOffset;
     private final GameLogic gameLogic = new GameLogic();
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
@@ -74,7 +76,7 @@ public class HexBoard extends View {
 //        hexagonRadius = (short) ((hexagonHeight / 2) / (Math.PI / 6));
         numColumns = 5;
         numRows = 5;
-        hexagonSize = 75;
+        hexagonSize = 80;
 //        totalRows = (short) (dimension / hexagonChunk);
     }
 
@@ -109,8 +111,8 @@ public class HexBoard extends View {
 //            }
 //        }
         // Calculate horizontal and vertical offsets to center the grid within the square view
-        float xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 1.75f;
-        float yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
+        xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 1.75f;
+        yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
 
         // Draw the hexagonal grid
         for (int row = 0; row < numRows; row++) {
@@ -197,24 +199,49 @@ public class HexBoard extends View {
     }
 
     private int[] getClickedHexagon(float touchX, float touchY) {
-        // Calculate the hexagon grid coordinates based on the touch coordinates
-        float xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 2f;
-        float yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
+//        // Calculate the hexagon grid coordinates based on the touch coordinates
+//        float xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 1.75f;
+//        float yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
+//
+//        int col = (int) ((touchX - xOffset) / (hexagonSize * 1.6f));
+//        int row = (int) ((touchY - yOffset) / (hexagonSize * 2f));
+//
+//        if (col % 2 != 0) {
+//            // Adjust row for odd columns
+//            row = (int) ((touchY - yOffset - hexagonSize * 0.75f) / (hexagonSize * 1.5f));
+//        }
+//
+//        // Check if the touch coordinates are within the bounds of the hexagon grid
+//        if (row >= 0 && row < numRows && col >= 0 && col < numColumns) {
+//            return new int[]{row, col};
+//        }
+//
+//        return null;
 
-        int col = (int) ((touchX - xOffset) / (hexagonSize * 2));
-        int row = (int) ((touchY - yOffset) / (hexagonSize * 1.5f));
+
+
+        // Adjust touch coordinates to account for grid offsets
+        float adjustedX = touchX - xOffset;
+        float adjustedY = touchY - yOffset;
+
+        // Calculate grid coordinates based on the adjusted touch coordinates
+        int col = (int) (adjustedX / (hexagonSize * 1.6f)); // Horizontal spacing is 1.6 * hexagonSize
+        int row = (int) (adjustedY / (hexagonSize * 2f)); // Vertical spacing is 2 * hexagonSize
 
         if (col % 2 != 0) {
             // Adjust row for odd columns
-            row = (int) ((touchY - yOffset - hexagonSize * 0.75f) / (hexagonSize * 1.5f));
+            row = (int) ((adjustedY - hexagonSize) / (hexagonSize * 2f));
         }
 
-        // Check if the touch coordinates are within the bounds of the hexagon grid
-        if (row >= 0 && row < numRows && col >= 0 && col < numColumns) {
+        // Check if the click is within the bounds of the grid
+        if (col >= 0 && col < numColumns && row >= 0 && row < numRows) {
+            // Verify if the click is inside the hexagon boundaries (optional)
+            // Perform further validation if needed based on hexagon geometry
             return new int[]{row, col};
         }
 
-        return null;
+        return null; // No hexagon clicked
+
     }
 
     public static boolean willExceedBoundary(int numRows, int numColumns, float hexagonSize, float dimension) {
