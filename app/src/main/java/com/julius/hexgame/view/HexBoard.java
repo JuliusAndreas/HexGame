@@ -7,12 +7,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.julius.hexgame.R;
+import com.julius.hexgame.util.GameLogic;
 
 public class HexBoard extends View {
 
@@ -24,12 +27,16 @@ public class HexBoard extends View {
     private final Paint strokePaint = new Paint();
     private final Path path = new Path();
     private short supremum = 5;
+    private int numColumns;
+    private int numRows;
     private short hexagonRadius;
     private short oddAreaHexagons;
     private short evenAreaHexagons;
-    private short totalColumnsAndRows;
+    private short totalRows;
     private short hexagonChunk;
+    private float hexagonSize;
     private short hexagonHeight;
+    private final GameLogic gameLogic = new GameLogic();
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -53,39 +60,38 @@ public class HexBoard extends View {
 
         setMeasuredDimension(dimension, dimension);
 
-        hexagonChunk = (short) (dimension / supremum);
-        hexagonHeight = (short) (hexagonChunk - (hexagonChunk / 10));
-        hexagonRadius = (short) ((hexagonChunk - (hexagonHeight / 2)) / (Math.PI / 6));
-        totalColumnsAndRows = (short) (dimension / hexagonChunk);
+
+//        float hexWidth = getWidth() / (2 * getRequiredColumns(getWidth(), getHeight()) - 1f);
+//        float hexHeight = getHeight() / (1.5f * getRequiredRows(getWidth(), getHeight()));
+//        hexagonSize = Math.min(hexWidth, hexHeight);
+//
+//        // Calculate the number of columns and rows based on the hexagon size
+//        numColumns = (int) (width / (hexagonSize * 2)) + 1;
+//        numRows = (int) (height / (hexagonSize * 1.5f)) + 1;
+
+//        hexagonChunk = (short) (dimension / supremum);
+//        hexagonHeight = (short) (hexagonChunk - (hexagonChunk / 10));
+//        hexagonRadius = (short) ((hexagonHeight / 2) / (Math.PI / 6));
+        numColumns = 5;
+        numRows = 5;
+        hexagonSize = 75;
+//        totalRows = (short) (dimension / hexagonChunk);
     }
 
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        strokePaint.setStrokeWidth(2);
-        strokePaint.setAntiAlias(true);
-        strokePaint.setColor(Color.BLACK);
-        strokePaint.setStyle(Paint.Style.STROKE);
-
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.GRAY);
-        paint.setAntiAlias(true);
-
-//        float radius = 50.0f;
-//        CornerPathEffect corEffect = new CornerPathEffect(radius);
-//        paint.setPathEffect(corEffect);
-        // Center and radius of the hexagon
-//        float cx = 500; // Center X coordinate
-//        float cy = 500; // Center Y coordinate
-//        short r = 55;  // Radius of the circumscribed circle
-//        path.moveTo(400, 20);
-//        path.lineTo(600, 20);
-//        path.lineTo(700, 100);
-//        path.lineTo(600, 200);
-//        path.lineTo(400, 200);
-//        path.lineTo(300, 100);
-//        path.lineTo(400, 20);
-        drawGameBoard(canvas);
-    }
+//    @Override
+//    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+//        super.onSizeChanged(w, h, oldw, oldh);
+//
+//        // Calculate the maximum hexagon size that fits within the square view
+//        float dimension = Math.min(w, h);
+//        float hexWidth = dimension / (6 * getRequiredColumns(dimension) - 1f);
+//        float hexHeight = dimension / (1.5f * getRequiredRows(dimension));
+//        hexagonSize = Math.min(hexWidth, hexHeight);
+//
+//        // Calculate the number of columns and rows based on the hexagon size
+//        numColumns = (int) (dimension / (hexagonSize * 2)) + 1;
+//        numRows = (int) (dimension / (hexagonSize * 1.5f)) + 1;
+//    }
 
     private void drawGameBoard(Canvas canvas) {
 //        for (int i = 0; i < totalColumns; i++) {
@@ -95,37 +101,138 @@ public class HexBoard extends View {
 //
 //            }
 //        }
-        for (int row = 0; row < totalColumnsAndRows; row++) {
-            for (int col = 0; col < totalColumnsAndRows; col++) {
-                float x = col * hexagonRadius * 1.5f;
-                float y = row * hexagonRadius * 2f + (col % 2) * hexagonRadius;
-                if (row == 0) {
-                    x = hexagonRadius * 1.1f;
-                }
-                if (col == 0) {
-                    y = hexagonRadius;
+//        for (int row = 0; row < 5; row++) {
+//            for (int col = 0; col < 5; col++) {
+//                float x = col * hexagonRadius * 1.5f + hexagonRadius;
+//                float y = row * hexagonRadius * 2f + (col % 2) * hexagonRadius + ((float) hexagonHeight / 2);
+//                drawHexagon(canvas, x, y);
+//            }
+//        }
+        // Calculate horizontal and vertical offsets to center the grid within the square view
+        float xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 1.75f;
+        float yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
+
+        // Draw the hexagonal grid
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numColumns; col++) {
+                float x = xOffset + col * hexagonSize * 1.6f;
+                float y = yOffset + row * hexagonSize * 2f;
+
+                if (col % 2 != 0) {
+                    y += hexagonSize; // Offset y for odd columns to create staggered layout
                 }
 
-                drawHexagon(canvas, x, y);
+                drawHexagon(canvas, x, y, hexagonSize);
             }
         }
     }
 
-    private void drawHexagon(Canvas canvas, float cx, float cy) {
-        // Calculate vertex positions
-        for (int i = 0; i < 6; i++) {
-            float angle = (float) (i * 2 * Math.PI / 6); // Angle for each vertex
-            float x = cx + hexagonRadius * (float) Math.cos(angle);
-            float y = cy + hexagonRadius * (float) Math.sin(angle);
-
-            if (i == 0) {
-                path.moveTo(x, y); // Move to the first vertex
-            } else {
-                path.lineTo(x, y); // Draw a line to the next vertex
-            }
+    private void drawHexagon(Canvas canvas, float centerX, float centerY, float size) {
+        float angle = (float) Math.toRadians(60);
+        path.moveTo(centerX + size * (float) Math.cos(0), centerY + size * (float) Math.sin(0));
+        for (int i = 1; i < 6; i++) {
+            path.lineTo(centerX + size * (float) Math.cos(angle * i), centerY + size * (float) Math.sin(angle * i));
         }
         path.close();
+
         canvas.drawPath(path, paint);
         canvas.drawPath(path, strokePaint);
     }
+
+
+    //    }
+//        canvas.drawPath(path, strokePaint);
+//        canvas.drawPath(path, paint);
+//        path.close();
+//        }
+//            }
+//                path.lineTo(x, y); // Draw a line to the next vertex
+//            } else {
+//                path.moveTo(x, y); // Move to the first vertex
+//            if (i == 0) {
+//
+//            float y = cy + hexagonSize * (float) Math.sin(angle);
+//            float x = cx + hexagonSize * (float) Math.cos(angle);
+//            float angle = (float) (i * 2 * Math.PI / 6); // Angle for each vertex
+//        for (int i = 0; i < 6; i++) {
+//        // Calculate vertex positions
+//    private void drawHexagon(Canvas canvas, float cx, float cy) {
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+
+        strokePaint.setStrokeWidth(2);
+        strokePaint.setAntiAlias(true);
+        strokePaint.setColor(Color.BLACK);
+        strokePaint.setStyle(Paint.Style.STROKE);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.GRAY);
+        paint.setAntiAlias(true);
+//        drawHexagon(canvas, 600,600, 55);
+//        hexagonSize = 55;
+        drawGameBoard(canvas);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            // Determine which hexagon was clicked
+            int[] clickedHex = getClickedHexagon(x, y);
+            if (clickedHex != null) {
+                int row = clickedHex[0];
+                int col = clickedHex[1];
+                Toast.makeText(getContext().getApplicationContext(), String.format("You clicked on (%s,%s)", row, col), Toast.LENGTH_SHORT).show();
+                // Handle click on hexagon at row, col
+                // Example: highlight the clicked hexagon
+                // invalidate() to redraw the view
+                invalidate();
+                return true;
+            }
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+    private int[] getClickedHexagon(float touchX, float touchY) {
+        // Calculate the hexagon grid coordinates based on the touch coordinates
+        float xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 2f;
+        float yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
+
+        int col = (int) ((touchX - xOffset) / (hexagonSize * 2));
+        int row = (int) ((touchY - yOffset) / (hexagonSize * 1.5f));
+
+        if (col % 2 != 0) {
+            // Adjust row for odd columns
+            row = (int) ((touchY - yOffset - hexagonSize * 0.75f) / (hexagonSize * 1.5f));
+        }
+
+        // Check if the touch coordinates are within the bounds of the hexagon grid
+        if (row >= 0 && row < numRows && col >= 0 && col < numColumns) {
+            return new int[]{row, col};
+        }
+
+        return null;
+    }
+
+    public static boolean willExceedBoundary(int numRows, int numColumns, float hexagonSize, float dimension) {
+        // Calculate required grid dimensions
+        float gridWidth = numColumns * hexagonSize * 1.5f;
+        float gridHeight = (float) (numRows * hexagonSize * Math.sqrt(3) / 2f);
+
+        // Check if grid dimensions exceed the square view dimensions
+        return gridWidth > dimension || gridHeight > dimension;
+    }
+
+    //    private int getRequiredColumns(float dimension) {
+//        float sideLength = dimension / (2 * (dimension / dimension) - 1f);
+//        return (int) (dimension / (sideLength * 2)) + 1;
+//    }
+//
+//    private int getRequiredRows(float dimension) {
+//        float sideLength = dimension / (1.5f * (dimension / dimension));
+//        return (int) (dimension / (sideLength * 1.5f)) + 1;
+//    }
 }
