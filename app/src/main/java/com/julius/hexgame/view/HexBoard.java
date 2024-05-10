@@ -77,6 +77,10 @@ public class HexBoard extends View {
         numColumns = 5;
         numRows = 5;
         hexagonSize = 80;
+
+        // Calculate horizontal and vertical offsets to center the grid within the square view
+        xOffset = (dimension - ((numColumns-1) * hexagonSize * 1.6f)) / 2f;
+        yOffset = (dimension - ((numRows-1) * hexagonSize * 2f)) / 2f;
 //        totalRows = (short) (dimension / hexagonChunk);
     }
 
@@ -110,9 +114,6 @@ public class HexBoard extends View {
 //                drawHexagon(canvas, x, y);
 //            }
 //        }
-        // Calculate horizontal and vertical offsets to center the grid within the square view
-        xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 1.75f;
-        yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
 
         // Draw the hexagonal grid
         for (int row = 0; row < numRows; row++) {
@@ -225,12 +226,13 @@ public class HexBoard extends View {
         float adjustedY = touchY - yOffset;
 
         // Calculate grid coordinates based on the adjusted touch coordinates
-        int col = (int) (adjustedX / (hexagonSize * 1.6f)); // Horizontal spacing is 1.6 * hexagonSize
-        int row = (int) (adjustedY / (hexagonSize * 2f)); // Vertical spacing is 2 * hexagonSize
+
+        int col = Math.round(adjustedX / (hexagonSize * 1.6f)); // Horizontal spacing is 1.6 * hexagonSize
+        int row = Math.round(adjustedY / (hexagonSize * 2f)); // Vertical spacing is 2 * hexagonSize
 
         if (col % 2 != 0) {
             // Adjust row for odd columns
-            row = (int) ((adjustedY - hexagonSize) / (hexagonSize * 2f));
+            row = Math.round((adjustedY - hexagonSize) / (hexagonSize * 2f));
         }
 
         // Check if the click is within the bounds of the grid
