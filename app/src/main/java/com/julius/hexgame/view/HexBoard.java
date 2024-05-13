@@ -77,10 +77,11 @@ public class HexBoard extends View {
         numColumns = 5;
         numRows = 5;
         hexagonSize = 80;
+        gameLogic.setRowsAndCols(numRows, numColumns);
 
         // Calculate horizontal and vertical offsets to center the grid within the square view
-        xOffset = (dimension - ((numColumns-1) * hexagonSize * 1.6f)) / 2f;
-        yOffset = (dimension - ((numRows-1) * hexagonSize * 2f)) / 2f;
+        xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
+        yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
 //        totalRows = (short) (dimension / hexagonChunk);
     }
 
@@ -97,8 +98,8 @@ public class HexBoard extends View {
 //        // Calculate the number of columns and rows based on the hexagon size
 //        numColumns = (int) (dimension / (hexagonSize * 2)) + 1;
 //        numRows = (int) (dimension / (hexagonSize * 1.5f)) + 1;
-//    }
 
+    //    }
     private void drawGameBoard(Canvas canvas) {
 //        for (int i = 0; i < totalColumns; i++) {
 //            if (i % 2 == 0) {
@@ -124,9 +125,48 @@ public class HexBoard extends View {
                 if (col % 2 != 0) {
                     y += hexagonSize; // Offset y for odd columns to create staggered layout
                 }
-
+                applyHexagonColor(row, col);
                 drawHexagon(canvas, x, y, hexagonSize);
             }
+        }
+    }
+
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+        strokePaint.setStrokeWidth(2.7f);
+        strokePaint.setAntiAlias(true);
+        strokePaint.setColor(Color.BLACK);
+        strokePaint.setStyle(Paint.Style.STROKE);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+//        drawHexagon(canvas, 600,600, 55);
+//        hexagonSize = 55;
+        drawGameBoard(canvas);
+    }
+
+    private void applyHexagonColor(int row, int col) {
+        switch (gameLogic.getHexState(row, col)) {
+            case 2:
+                paint.setColor(Color.BLUE);
+                return;
+            case 3:
+                paint.setColor(Color.RED);
+                return;
+            case 4:
+                if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
+                    paint.setColor(Color.BLUE);
+                    paint.setAlpha(128);
+                    return;
+                }
+                if (gameLogic.getTurn() == gameLogic.getPlayerTwo()) {
+                    paint.setColor(Color.RED);
+                    paint.setAlpha(128);
+                    return;
+                }
+                return;
+            default:
+                paint.setColor(Color.GRAY);
         }
     }
 
@@ -140,8 +180,8 @@ public class HexBoard extends View {
 
         canvas.drawPath(path, paint);
         canvas.drawPath(path, strokePaint);
+        path.reset();
     }
-
 
     //    }
 //        canvas.drawPath(path, strokePaint);
@@ -160,21 +200,6 @@ public class HexBoard extends View {
 //        for (int i = 0; i < 6; i++) {
 //        // Calculate vertex positions
 //    private void drawHexagon(Canvas canvas, float cx, float cy) {
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-
-        strokePaint.setStrokeWidth(2);
-        strokePaint.setAntiAlias(true);
-        strokePaint.setColor(Color.BLACK);
-        strokePaint.setStyle(Paint.Style.STROKE);
-
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.GRAY);
-        paint.setAntiAlias(true);
-//        drawHexagon(canvas, 600,600, 55);
-//        hexagonSize = 55;
-        drawGameBoard(canvas);
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -187,9 +212,9 @@ public class HexBoard extends View {
             if (clickedHex != null) {
                 int row = clickedHex[0];
                 int col = clickedHex[1];
-                Toast.makeText(getContext().getApplicationContext(), String.format("You clicked on (%s,%s)", row, col), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext().getApplicationContext(), String.format("You clicked on (%s,%s)", row, col), Toast.LENGTH_SHORT).show();
                 // Handle click on hexagon at row, col
-                // Example: highlight the clicked hexagon
+                gameLogic.act(row, col);
                 // invalidate() to redraw the view
                 invalidate();
                 return true;
@@ -218,7 +243,6 @@ public class HexBoard extends View {
 //        }
 //
 //        return null;
-
 
 
         // Adjust touch coordinates to account for grid offsets
