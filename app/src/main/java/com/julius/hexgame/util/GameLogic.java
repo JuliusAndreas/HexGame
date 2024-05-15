@@ -1,5 +1,10 @@
 package com.julius.hexgame.util;
 
+import android.util.Pair;
+
+import java.util.HashSet;
+import java.util.Set;
+
 public class GameLogic {
     private short numRows;
     private short numCols;
@@ -61,35 +66,78 @@ public class GameLogic {
             if (!validCellChoice(row, col)) return;
             switchToChosenState(row, col);
         } else {
-            // simply change the state of the cell for now
-            if (turn == playerOne) {
-                if (chosenCellIsSelected(row, col)) {
-                    SwitchBackFromChosenState();
-                    return;
-                }
-                board[row][col] = 2;
-                SwitchBackFromChosenState();
-                switchTurn();
+            if (chosenCellIsSelected(row, col)) {
+                switchBackFromChosenState();
                 return;
             }
-            if (turn == playerTwo) {
-                if (chosenCellIsSelected(row, col)) {
-                    SwitchBackFromChosenState();
-                    return;
+            march(row, col);
+        }
+    }
+
+    private void march(int row, int col) {
+        Set<Pair<Integer, Integer>> neighbors;
+        if ((neighbors = validReplicationMove(row, col)) == null) {
+            return;
+        }
+        for (Pair<Integer, Integer> cell : neighborsOf(row, col)) {
+            replicateToCell(cell);
+        }
+        replicateToCoordinates(row, col);
+        switchBackFromChosenState();
+        switchTurns();
+    }
+
+    private void replicateToCoordinates(int row, int col) {
+        board[row][col] = (byte) (turn == playerOne ? 2 : 3);
+    }
+
+    private void replicateToCell(Pair<Integer, Integer> cell) {
+        if (board[cell.first][cell.second] == 2
+                || board[cell.first][cell.second] == 3) {
+            board[cell.first][cell.second] = (byte) (turn == playerOne ? 2 : 3);
+        }
+    }
+
+    private Set<Pair<Integer, Integer>> validReplicationMove(int row, int col) {
+        Set<Pair<Integer, Integer>> neighbors = neighborsOf(chosenRow, chosenCol);
+        if (neighbors.contains(Pair.create(row, col)) && board[row][col] == 1) {
+            return neighbors;
+        }
+        return null;
+    }
+
+    private Set<Pair<Integer, Integer>> neighborsOf(int row, int col) {
+        Set<Pair<Integer, Integer>> neighbors = new HashSet<>(7);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (neighborShouldNotBeGenerated(i, j, col % 2 == 0)) continue;
+                Pair<Integer, Integer> neighbor = Pair.create(row + i, col + j);
+                if (validCell(neighbor)) {
+                    neighbors.add(neighbor);
                 }
-                board[row][col] = 3;
-                SwitchBackFromChosenState();
-                switchTurn();
-                return;
             }
         }
+        return neighbors;
+    }
+
+    private boolean neighborShouldNotBeGenerated(int i, int j, boolean isEvenColumn) {
+        if (isEvenColumn) {
+            return (i == 1 && j == -1) || (i == 1 && j == 1);
+        } else {
+            return (i == -1 && j == -1) || (i == -1 && j == 1);
+        }
+    }
+
+    private boolean validCell(Pair<Integer, Integer> cell) {
+        return cell.first < numRows && cell.first >= 0
+                && cell.second < numCols && cell.second >= 0;
     }
 
     private boolean chosenCellIsSelected(int row, int col) {
         return row == chosenRow && col == chosenCol;
     }
 
-    private void SwitchBackFromChosenState() {
+    private void switchBackFromChosenState() {
         chosenState = false;
         chosenRow = -1;
         chosenCol = -1;
@@ -113,7 +161,7 @@ public class GameLogic {
         return turn;
     }
 
-    public void switchTurn() {
+    public void switchTurns() {
         this.turn = !turn;
     }
 
