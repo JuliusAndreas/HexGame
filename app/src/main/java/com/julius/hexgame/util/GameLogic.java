@@ -75,16 +75,55 @@ public class GameLogic {
     }
 
     private void march(int row, int col) {
-        Set<Pair<Integer, Integer>> neighbors;
-        if ((neighbors = validReplicationMove(row, col)) == null) {
-            return;
+        Set<Pair<Integer, Integer>> neighbors = neighborsOf(chosenRow, chosenCol);
+        boolean isReplication = false;
+        boolean isJump = false;
+        if (validReplicationMove(neighbors, row, col)) {
+            isReplication = true;
+        } else {
+            if (validJumpMove(neighbors, row, col)) {
+                isJump = true;
+            } else return;
         }
+        if (isReplication) {
+            commenceReplication(row, col);
+        } else if (isJump) {
+            commenceJump(row, col);
+        }
+    }
+
+    private void commenceJump(int row, int col) {
+        for (Pair<Integer, Integer> cell : neighborsOf(row, col)) {
+            replicateToCell(cell);
+        }
+        replicateToCoordinates(row, col);
+        jumpFromPreviousPosition();
+        switchBackFromChosenState();
+        switchTurns();
+    }
+
+    private void jumpFromPreviousPosition() {
+        board[chosenRow][chosenCol] = 1;
+    }
+
+    private void commenceReplication(int row, int col) {
         for (Pair<Integer, Integer> cell : neighborsOf(row, col)) {
             replicateToCell(cell);
         }
         replicateToCoordinates(row, col);
         switchBackFromChosenState();
         switchTurns();
+    }
+
+    private boolean validJumpMove(Set<Pair<Integer, Integer>> neighbors, int row, int col) {
+        for (Pair<Integer, Integer> neighbor : neighbors) {
+            if (neighbor.first == chosenRow && neighbor.second == chosenCol) continue;
+            if (neighborsOf(neighbor.first, neighbor.second).contains(Pair.create(row, col))
+                    && (row != chosenRow || col != chosenCol)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void replicateToCoordinates(int row, int col) {
@@ -98,12 +137,8 @@ public class GameLogic {
         }
     }
 
-    private Set<Pair<Integer, Integer>> validReplicationMove(int row, int col) {
-        Set<Pair<Integer, Integer>> neighbors = neighborsOf(chosenRow, chosenCol);
-        if (neighbors.contains(Pair.create(row, col)) && board[row][col] == 1) {
-            return neighbors;
-        }
-        return null;
+    private boolean validReplicationMove(Set<Pair<Integer, Integer>> neighbors, int row, int col) {
+        return neighbors.contains(Pair.create(row, col)) && board[row][col] == 1;
     }
 
     private Set<Pair<Integer, Integer>> neighborsOf(int row, int col) {
