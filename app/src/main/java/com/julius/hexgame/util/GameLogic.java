@@ -24,6 +24,12 @@ public class GameLogic {
     private byte[][] board;
     private byte chosenRow = -1;
     private byte chosenCol = -1;
+    private boolean gameOver;
+    private Boolean winner = null;
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
 
     public GameLogic(int numRows, int numCols) {
         this.numRows = (short) numRows;
@@ -62,6 +68,7 @@ public class GameLogic {
     }
 
     public void act(int row, int col) {
+        if (gameOver) return;
         if (!chosenState) {
             if (!validCellChoice(row, col)) return;
             switchToChosenState(row, col);
@@ -71,7 +78,97 @@ public class GameLogic {
                 return;
             }
             march(row, col);
+            checkGameOver();
+            if (gameOver) {
+                determineWhoWon();
+            }
         }
+    }
+
+    private void determineWhoWon() {
+        int playerOneScore = 0;
+        int playerTwoScore = 0;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 2) {
+                    playerOneScore++;
+                } else if (board[i][j] == 3) playerTwoScore++;
+            }
+        }
+        if (playerOneScore > playerTwoScore) {
+            this.winner = playerOne;
+        } else if (playerOneScore < playerTwoScore) {
+            this.winner = playerTwo;
+        } else {
+            // it's a draw
+            this.winner = null;
+        }
+    }
+
+    private void checkGameOver() {
+        this.gameOver = boardIsFull() || noPossibleMovesAvailable() || noMorePawnsRemain();
+    }
+
+    private boolean noMorePawnsRemain() {
+        int playerOnePossibleMoves = 0;
+        int playerTwoPossibleMoves = 0;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 2) {
+                    playerOnePossibleMoves++;
+                } else if (board[i][j] == 3) playerTwoPossibleMoves++;
+                if (playerOnePossibleMoves > 0 && playerTwoPossibleMoves > 0) return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean noPossibleMovesAvailable() {
+        int playerOnePossibleMoves = 0;
+        int playerTwoPossibleMoves = 0;
+        Set<Pair<Integer, Integer>> neighbors;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 1 || board[i][j] == -1) continue;
+                neighbors = neighborsOf(i, j);
+                if (thereIsReplicationMoveAvailable(neighbors)
+                        || thereIsJumpMoveAvailable(neighbors)) {
+                    if (board[i][j] == 2) {
+                        playerOnePossibleMoves++;
+                    } else if (board[i][j] == 3) playerTwoPossibleMoves++;
+                }
+                if (playerOnePossibleMoves > 0 && playerTwoPossibleMoves > 0) return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean thereIsReplicationMoveAvailable(Set<Pair<Integer, Integer>> neighbors) {
+        for (Pair<Integer, Integer> neighbor : neighbors) {
+            if (board[neighbor.first][neighbor.second] == 1) return true;
+        }
+        return false;
+    }
+
+    private boolean thereIsJumpMoveAvailable(Set<Pair<Integer, Integer>> neighbors) {
+        Set<Pair<Integer, Integer>> neighborsOfTheNeighbor;
+        for (Pair<Integer, Integer> neighbor : neighbors) {
+            neighborsOfTheNeighbor = neighborsOf(neighbor.first, neighbor.second);
+            for (Pair<Integer, Integer> neighborOfTheNeighbor : neighborsOfTheNeighbor) {
+                if (board[neighborOfTheNeighbor.first][neighborOfTheNeighbor.second] == 1)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean boardIsFull() {
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 1) return false;
+            }
+        }
+        return true;
     }
 
     private void march(int row, int col) {
@@ -119,7 +216,7 @@ public class GameLogic {
         for (Pair<Integer, Integer> neighbor : neighbors) {
             if (neighbor.first == chosenRow && neighbor.second == chosenCol) continue;
             if (neighborsOf(neighbor.first, neighbor.second).contains(Pair.create(row, col))
-                    && (row != chosenRow || col != chosenCol)) {
+                    && (row != chosenRow || col != chosenCol) && (board[row][col] == 1)) {
                 return true;
             }
         }
