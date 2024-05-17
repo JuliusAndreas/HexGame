@@ -5,14 +5,67 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:theme="@android:style/ThemeOverlay.Material.Dark"
+    android:background="@color/activityBackGroundColor">
 
-    <com.julius.hexgame.view.HexBoard
-        android:id="@+id/hexBoard"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="98dp"
+        android:layout_marginTop="132dp"
+        android:alpha="12"
+        android:fontFamily="@font/asul"
+        android:text="@string/homeTitle"
+        android:textColor="@color/btnColor"
+        android:textSize="36sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="107dp"
+        android:layout_height="68dp"
+        android:layout_marginTop="200dp"
+        android:background="@drawable/main_menu_btn"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text="@string/playVersusBtn"
+        android:fontFamily="@font/asul"
+        android:textColor="@color/whiteTxtForBtn"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="124dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/main_menu_btn"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text="@string/playAIBtn"
+        android:fontFamily="@font/asul"
+        android:textColor="@color/whiteTxtForBtn"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="124dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/main_menu_btn"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text="@string/mapEditorBtn"
+        android:fontFamily="@font/asul"
+        android:textColor="@color/whiteTxtForBtn"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Hex Game</string>
+    <string name="homeTitle">HEX</string>
+    <string name="playVersusBtn">Play PVP</string>
+    <string name="playAIBtn">Play with AI</string>
+    <string name="mapEditorBtn">Map Editor</string>
 </resources>

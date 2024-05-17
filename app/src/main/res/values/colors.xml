@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="whiteTxtForBtn">#E3E2E6</color>
+    <color name="activityBackGroundColor">#0B666A</color>
+    <color name="btnColor">#240750</color>
+    <color name="neonDark">#071952</color>
 </resources>
