@@ -6,4 +6,6 @@
     <color name="activityBackGroundColor">#0B666A</color>
     <color name="btnColor">#240750</color>
     <color name="neonDark">#071952</color>
+    <color name="scoreNumber">#27005D</color>
+    <color name="scoreName">#900C3F</color>
 </resources>

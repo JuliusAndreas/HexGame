@@ -4,4 +4,9 @@
     <string name="playVersusBtn">Play PVP</string>
     <string name="playAIBtn">Play with AI</string>
     <string name="mapEditorBtn">Map Editor</string>
+    <string name="player_1">Player 1</string>
+    <string name="player_1_name">Player 1 Name</string>
+    <string name="player_2">Player 2</string>
+    <string name="player_2_name">Player 2 Name</string>
+    <string name="submit_and_play">Submit and play</string>
 </resources>
