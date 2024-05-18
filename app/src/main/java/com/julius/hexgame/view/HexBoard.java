@@ -39,6 +39,7 @@ public class HexBoard extends View {
     private float xOffset;
     private float yOffset;
     private final GameLogic gameLogic = new GameLogic();
+    private int dimension;
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -58,9 +59,15 @@ public class HexBoard extends View {
     protected void onMeasure(int width, int height) {
         super.onMeasure(width, height);
 
-        int dimension = Math.min(getMeasuredWidth(), getMeasuredHeight());
+        this.dimension = Math.min(getMeasuredWidth(), getMeasuredHeight());
 
         setMeasuredDimension(dimension, dimension);
+
+        gameLogic.setRowsAndCols(numRows, numColumns);
+
+        // Calculate horizontal and vertical offsets to center the grid within the square view
+        xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
+        yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
 
 
 //        float hexWidth = getWidth() / (2 * getRequiredColumns(getWidth(), getHeight()) - 1f);
@@ -74,15 +81,21 @@ public class HexBoard extends View {
 //        hexagonChunk = (short) (dimension / supremum);
 //        hexagonHeight = (short) (hexagonChunk - (hexagonChunk / 10));
 //        hexagonRadius = (short) ((hexagonHeight / 2) / (Math.PI / 6));
-        numColumns = 5;
-        numRows = 5;
-        hexagonSize = 80;
-        gameLogic.setRowsAndCols(numRows, numColumns);
-
-        // Calculate horizontal and vertical offsets to center the grid within the square view
-        xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
-        yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
+//        numColumns = 5;
+//        numRows = 5;
+//        hexagonSize = 80;
+//        gameLogic.setRowsAndCols(numRows, numColumns);
+//
+//        // Calculate horizontal and vertical offsets to center the grid within the square view
+//        xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
+//        yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
 //        totalRows = (short) (dimension / hexagonChunk);
+    }
+
+    public void setUpBoard(int numRows, int numColumns, float hexagonSize){
+        this.numRows = numRows;
+        this.numColumns = numColumns;
+        this.hexagonSize = hexagonSize;
     }
 
 //    @Override
@@ -156,12 +169,12 @@ public class HexBoard extends View {
             case 4:
                 if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
                     paint.setColor(Color.BLUE);
-                    paint.setAlpha(128);
+                    paint.setAlpha(100);
                     return;
                 }
                 if (gameLogic.getTurn() == gameLogic.getPlayerTwo()) {
                     paint.setColor(Color.RED);
-                    paint.setAlpha(128);
+                    paint.setAlpha(100);
                     return;
                 }
                 return;
