@@ -36,7 +36,8 @@ public class GamePlayActivity extends AppCompatActivity {
         hexBoard = findViewById(R.id.hexBoard);
         int rows = getIntent().getIntExtra("rows", 5);
         int columns = getIntent().getIntExtra("columns", 5);
-        hexBoard.setUpBoard(rows, columns, 80);
+        int hexSize = getIntent().getIntExtra("hex_size", 80);
+        hexBoard.setUpBoard(rows, columns, hexSize);
         String playerOneNameStr = getIntent().getStringExtra("player_one_name");
         String playerTwoNameStr = getIntent().getStringExtra("player_two_name");
         txtPlayerOneName.setText((playerOneNameStr == null || playerOneNameStr.isEmpty()) ?
