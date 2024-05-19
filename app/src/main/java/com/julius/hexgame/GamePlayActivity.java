@@ -34,7 +34,9 @@ public class GamePlayActivity extends AppCompatActivity {
         txtPlayerOneScore = findViewById(R.id.scorePlayerOne);
         txtPlayerTwoScore = findViewById(R.id.scorePlayerTwo);
         hexBoard = findViewById(R.id.hexBoard);
-        hexBoard.setUpBoard(5, 5, 70);
+        int rows = getIntent().getIntExtra("rows", 5);
+        int columns = getIntent().getIntExtra("columns", 5);
+        hexBoard.setUpBoard(rows, columns, 80);
         String playerOneNameStr = getIntent().getStringExtra("player_one_name");
         String playerTwoNameStr = getIntent().getStringExtra("player_two_name");
         txtPlayerOneName.setText((playerOneNameStr == null || playerOneNameStr.isEmpty()) ?
