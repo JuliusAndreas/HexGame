@@ -35,8 +35,7 @@ public class GameLogic {
     }
 
     public GameLogic(int numRows, int numCols) {
-        this.numRows = (short) numRows;
-        this.numCols = (short) numCols;
+        this.setRowsAndCols(numRows, numCols);
     }
 
     public GameLogic() {

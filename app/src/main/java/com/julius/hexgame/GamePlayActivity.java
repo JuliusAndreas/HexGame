@@ -1,5 +1,6 @@
 package com.julius.hexgame;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -54,10 +55,18 @@ public class GamePlayActivity extends AppCompatActivity {
                 "Player 1" : playerOneNameStr;
         playerTwoNameStr = (playerTwoNameStr == null || playerTwoNameStr.isEmpty()) ?
                 "Player 2" : playerTwoNameStr;
-        txtPlayerOneName.setText(playerOneNameStr);
-        txtPlayerTwoName.setText(playerTwoNameStr);
         hexBoard.setPlayerNames(playerOneNameStr, playerTwoNameStr);
         hexBoard.setElements(txtPlayerOneScore, txtPlayerTwoScore, txtGameState,
-                btnHome, btnPlayAgain);
+                btnHome, btnPlayAgain, txtPlayerOneName, txtPlayerTwoName);
+        hexBoard.configureElements();
+    }
+
+    public void playAgain(View view) {
+        hexBoard.resetGame();
+    }
+
+    public void home(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

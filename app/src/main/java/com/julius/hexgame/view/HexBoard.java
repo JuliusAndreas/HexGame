@@ -39,16 +39,18 @@ public class HexBoard extends View {
     private short hexagonHeight;
     private float xOffset;
     private float yOffset;
-    private final GameLogic gameLogic = new GameLogic();
+    private GameLogic gameLogic = new GameLogic();
     private int dimension;
     private TextView txtPlayerOneScore;
     private TextView txtPlayerTwoScore;
     private TextView txtGameState;
     private Button btnHome;
     private Button btnPlayAgain;
-    private boolean hasShownGameOverTxt = false;
+    private boolean hasShownGameOverTxtAnimation = false;
     private String playerOneName;
     private String playerTwoName;
+    private TextView txtPlayerOneName;
+    private TextView txtPlayerTwoName;
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -77,6 +79,7 @@ public class HexBoard extends View {
         // Calculate horizontal and vertical offsets to center the grid within the square view
         xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
         yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
+
     }
 
     public void setUpBoard(int numRows, int numColumns, float hexagonSize) {
@@ -86,38 +89,23 @@ public class HexBoard extends View {
     }
 
     public void setElements(TextView txtPlayerOneScore, TextView txtPlayerTwoScore,
-                            TextView txtGameState, Button btnHome, Button btnPlayAgain) {
+                            TextView txtGameState, Button btnHome, Button btnPlayAgain,
+                            TextView txtPlayerOneName, TextView txtPlayerTwoName) {
         this.txtPlayerOneScore = txtPlayerOneScore;
         this.txtPlayerTwoScore = txtPlayerTwoScore;
         this.txtGameState = txtGameState;
         this.btnHome = btnHome;
         this.btnPlayAgain = btnPlayAgain;
+        this.txtPlayerOneName = txtPlayerOneName;
+        this.txtPlayerTwoName = txtPlayerTwoName;
     }
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        adjustGameStateTxt();
         if (gameLogic.isGameOver()) {
-            String winnerName;
-            if (gameLogic.getWinner() == gameLogic.getPlayerOne()) {
-                winnerName = playerOneName;
-            } else if (gameLogic.getWinner() == gameLogic.getPlayerTwo()) {
-                winnerName = playerTwoName;
-            } else {
-                winnerName = "";
-            }
-            txtGameState.setText(String.format("%s Won", winnerName));
-            if (!hasShownGameOverTxt) {
-                // do some animation
-                this.hasShownGameOverTxt = true;
-            }
-        } else {
-            String playerToPlayName;
-            if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
-                playerToPlayName = playerOneName;
-            } else {
-                playerToPlayName = playerTwoName;
-            }
-            txtGameState.setText(String.format("%s's turn", playerToPlayName));
+            btnPlayAgain.setVisibility(VISIBLE);
+            btnHome.setVisibility(VISIBLE);
         }
         strokePaint.setStrokeWidth(2.7f);
         strokePaint.setAntiAlias(true);
@@ -131,6 +119,38 @@ public class HexBoard extends View {
 
         txtPlayerOneScore.setText(String.valueOf(gameLogic.getPlayerOneScore()));
         txtPlayerTwoScore.setText(String.valueOf(gameLogic.getPlayerTwoScore()));
+    }
+
+    private void adjustGameStateTxt() {
+        if (gameLogic.isGameOver()) {
+            String winnerName;
+            if (gameLogic.getWinner() == gameLogic.getPlayerOne()) {
+                txtGameState.setTextColor(Color.BLUE);
+                winnerName = playerOneName;
+            } else if (gameLogic.getWinner() == gameLogic.getPlayerTwo()) {
+                txtGameState.setTextColor(Color.RED);
+                winnerName = playerTwoName;
+            } else {
+                txtGameState.setTextColor(Color.WHITE);
+                winnerName = "";
+            }
+            txtGameState.setText(winnerName.isEmpty() ?
+                    "It's a draw" : String.format("%s Won", winnerName));
+            if (!hasShownGameOverTxtAnimation) {
+                // do some animation
+                this.hasShownGameOverTxtAnimation = true;
+            }
+        } else {
+            String playerToPlayName;
+            if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
+                playerToPlayName = playerOneName;
+                txtGameState.setTextColor(Color.BLUE);
+            } else {
+                playerToPlayName = playerTwoName;
+                txtGameState.setTextColor(Color.RED);
+            }
+            txtGameState.setText(String.format("%s's turn", playerToPlayName));
+        }
     }
 
     private void drawGameBoard(Canvas canvas) {
@@ -235,5 +255,21 @@ public class HexBoard extends View {
     public void setPlayerNames(String playerOneNameStr, String playerTwoNameStr) {
         this.playerOneName = playerOneNameStr;
         this.playerTwoName = playerTwoNameStr;
+    }
+
+    public void configureElements() {
+        txtPlayerOneName.setText(playerOneName);
+        txtPlayerTwoName.setText(playerTwoName);
+        txtPlayerOneName.setTextColor(Color.BLUE);
+        txtPlayerTwoName.setTextColor(Color.RED);
+        txtPlayerOneScore.setTextColor(Color.BLUE);
+        txtPlayerTwoScore.setTextColor(Color.RED);
+    }
+
+    public void resetGame() {
+        this.gameLogic = new GameLogic(numRows, numColumns);
+        btnHome.setVisibility(GONE);
+        btnPlayAgain.setVisibility(GONE);
+        invalidate();
     }
 }

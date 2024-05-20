@@ -10,4 +10,6 @@
     <string name="player_2_name">Player 2 Name</string>
     <string name="submit_and_play">Submit and play</string>
     <string name="dimensions">Dimensions</string>
+    <string name="play_again">Play again</string>
+    <string name="home">Home</string>
 </resources>
