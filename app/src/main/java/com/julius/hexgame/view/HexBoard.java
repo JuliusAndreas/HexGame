@@ -218,7 +218,7 @@ public class HexBoard extends View {
         float x = event.getX();
         float y = event.getY();
 
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && !gameLogic.isGameOver()) {
             // Determine which hexagon was clicked
             int[] clickedHex = getClickedHexagon(x, y);
             if (clickedHex != null) {
