@@ -136,10 +136,12 @@ public class HexBoard extends View {
             }
             txtGameState.setText(winnerName.isEmpty() ?
                     "It's a draw" : String.format("%s Won", winnerName));
-            if (!hasShownGameOverTxtAnimation) {
-                // do some animation
-                this.hasShownGameOverTxtAnimation = true;
-            }
+
+            txtGameState.animate()
+                    .rotationYBy(1800)
+                    .setDuration(5000)
+                    .start();
+
         } else {
             String playerToPlayName;
             if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
