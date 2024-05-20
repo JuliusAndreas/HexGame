@@ -137,10 +137,7 @@ public class HexBoard extends View {
             txtGameState.setText(winnerName.isEmpty() ?
                     "It's a draw" : String.format("%s Won", winnerName));
 
-            txtGameState.animate()
-                    .rotationYBy(1800)
-                    .setDuration(5000)
-                    .start();
+            animateGameOverTxt();
 
         } else {
             String playerToPlayName;
@@ -153,6 +150,13 @@ public class HexBoard extends View {
             }
             txtGameState.setText(String.format("%s's turn", playerToPlayName));
         }
+    }
+
+    private void animateGameOverTxt() {
+        txtGameState.animate()
+                .rotationYBy(1800)
+                .setDuration(5000)
+                .start();
     }
 
     private void drawGameBoard(Canvas canvas) {

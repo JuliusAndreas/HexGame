@@ -3,6 +3,7 @@ package com.julius.hexgame;
 import static java.security.AccessController.getContext;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -16,17 +17,23 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.IOException;
+
 public class PlayerConfigActivity extends AppCompatActivity {
+    MediaPlayer configMenuSong;
     EditText edtTextPlayerOneName;
     EditText edtTextPlayerTwoName;
     EditText numberOfRows;
     EditText numberOfColumns;
+    private boolean mediaIsStopped = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_player_config);
+        configMenuSong = MediaPlayer.create(this, R.raw.amomentspeace);
+        configMenuSong.start();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -36,6 +43,37 @@ public class PlayerConfigActivity extends AppCompatActivity {
         edtTextPlayerTwoName = findViewById(R.id.playerTwoName);
         numberOfRows = findViewById(R.id.rows);
         numberOfColumns = findViewById(R.id.columns);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        configMenuSong.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        configMenuSong.start();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        configMenuSong.start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        configMenuSong.pause();
+        configMenuSong.seekTo(0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        configMenuSong.release();
     }
 
     public void goToGamePlayAcitivity(View view) {
