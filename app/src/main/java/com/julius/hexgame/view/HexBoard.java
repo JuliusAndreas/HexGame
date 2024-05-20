@@ -9,7 +9,8 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,6 +41,14 @@ public class HexBoard extends View {
     private float yOffset;
     private final GameLogic gameLogic = new GameLogic();
     private int dimension;
+    private TextView txtPlayerOneScore;
+    private TextView txtPlayerTwoScore;
+    private TextView txtGameState;
+    private Button btnHome;
+    private Button btnPlayAgain;
+    private boolean hasShownGameOverTxt = false;
+    private String playerOneName;
+    private String playerTwoName;
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -68,67 +77,63 @@ public class HexBoard extends View {
         // Calculate horizontal and vertical offsets to center the grid within the square view
         xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
         yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
-
-
-//        float hexWidth = getWidth() / (2 * getRequiredColumns(getWidth(), getHeight()) - 1f);
-//        float hexHeight = getHeight() / (1.5f * getRequiredRows(getWidth(), getHeight()));
-//        hexagonSize = Math.min(hexWidth, hexHeight);
-//
-//        // Calculate the number of columns and rows based on the hexagon size
-//        numColumns = (int) (width / (hexagonSize * 2)) + 1;
-//        numRows = (int) (height / (hexagonSize * 1.5f)) + 1;
-
-//        hexagonChunk = (short) (dimension / supremum);
-//        hexagonHeight = (short) (hexagonChunk - (hexagonChunk / 10));
-//        hexagonRadius = (short) ((hexagonHeight / 2) / (Math.PI / 6));
-//        numColumns = 5;
-//        numRows = 5;
-//        hexagonSize = 80;
-//        gameLogic.setRowsAndCols(numRows, numColumns);
-//
-//        // Calculate horizontal and vertical offsets to center the grid within the square view
-//        xOffset = (dimension - ((numColumns - 1) * hexagonSize * 1.6f)) / 2f;
-//        yOffset = (dimension - ((numRows - 1) * hexagonSize * 2f)) / 2f;
-//        totalRows = (short) (dimension / hexagonChunk);
     }
 
-    public void setUpBoard(int numRows, int numColumns, float hexagonSize){
+    public void setUpBoard(int numRows, int numColumns, float hexagonSize) {
         this.numRows = numRows;
         this.numColumns = numColumns;
         this.hexagonSize = hexagonSize;
     }
 
-//    @Override
-//    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-//        super.onSizeChanged(w, h, oldw, oldh);
-//
-//        // Calculate the maximum hexagon size that fits within the square view
-//        float dimension = Math.min(w, h);
-//        float hexWidth = dimension / (6 * getRequiredColumns(dimension) - 1f);
-//        float hexHeight = dimension / (1.5f * getRequiredRows(dimension));
-//        hexagonSize = Math.min(hexWidth, hexHeight);
-//
-//        // Calculate the number of columns and rows based on the hexagon size
-//        numColumns = (int) (dimension / (hexagonSize * 2)) + 1;
-//        numRows = (int) (dimension / (hexagonSize * 1.5f)) + 1;
+    public void setElements(TextView txtPlayerOneScore, TextView txtPlayerTwoScore,
+                            TextView txtGameState, Button btnHome, Button btnPlayAgain) {
+        this.txtPlayerOneScore = txtPlayerOneScore;
+        this.txtPlayerTwoScore = txtPlayerTwoScore;
+        this.txtGameState = txtGameState;
+        this.btnHome = btnHome;
+        this.btnPlayAgain = btnPlayAgain;
+    }
 
-    //    }
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+        if (gameLogic.isGameOver()) {
+            String winnerName;
+            if (gameLogic.getWinner() == gameLogic.getPlayerOne()) {
+                winnerName = playerOneName;
+            } else if (gameLogic.getWinner() == gameLogic.getPlayerTwo()) {
+                winnerName = playerTwoName;
+            } else {
+                winnerName = "";
+            }
+            txtGameState.setText(String.format("%s Won", winnerName));
+            if (!hasShownGameOverTxt) {
+                // do some animation
+                this.hasShownGameOverTxt = true;
+            }
+        } else {
+            String playerToPlayName;
+            if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
+                playerToPlayName = playerOneName;
+            } else {
+                playerToPlayName = playerTwoName;
+            }
+            txtGameState.setText(String.format("%s's turn", playerToPlayName));
+        }
+        strokePaint.setStrokeWidth(2.7f);
+        strokePaint.setAntiAlias(true);
+        strokePaint.setColor(Color.BLACK);
+        strokePaint.setStyle(Paint.Style.STROKE);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+
+        drawGameBoard(canvas);
+
+        txtPlayerOneScore.setText(String.valueOf(gameLogic.getPlayerOneScore()));
+        txtPlayerTwoScore.setText(String.valueOf(gameLogic.getPlayerTwoScore()));
+    }
+
     private void drawGameBoard(Canvas canvas) {
-//        for (int i = 0; i < totalColumns; i++) {
-//            if (i % 2 == 0) {
-//
-//            } else {
-//
-//            }
-//        }
-//        for (int row = 0; row < 5; row++) {
-//            for (int col = 0; col < 5; col++) {
-//                float x = col * hexagonRadius * 1.5f + hexagonRadius;
-//                float y = row * hexagonRadius * 2f + (col % 2) * hexagonRadius + ((float) hexagonHeight / 2);
-//                drawHexagon(canvas, x, y);
-//            }
-//        }
-
         // Draw the hexagonal grid
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numColumns; col++) {
@@ -142,20 +147,6 @@ public class HexBoard extends View {
                 drawHexagon(canvas, x, y, hexagonSize);
             }
         }
-    }
-
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        strokePaint.setStrokeWidth(2.7f);
-        strokePaint.setAntiAlias(true);
-        strokePaint.setColor(Color.BLACK);
-        strokePaint.setStyle(Paint.Style.STROKE);
-
-        paint.setStyle(Paint.Style.FILL);
-        paint.setAntiAlias(true);
-//        drawHexagon(canvas, 600,600, 55);
-//        hexagonSize = 55;
-        drawGameBoard(canvas);
     }
 
     private void applyHexagonColor(int row, int col) {
@@ -196,24 +187,6 @@ public class HexBoard extends View {
         path.reset();
     }
 
-    //    }
-//        canvas.drawPath(path, strokePaint);
-//        canvas.drawPath(path, paint);
-//        path.close();
-//        }
-//            }
-//                path.lineTo(x, y); // Draw a line to the next vertex
-//            } else {
-//                path.moveTo(x, y); // Move to the first vertex
-//            if (i == 0) {
-//
-//            float y = cy + hexagonSize * (float) Math.sin(angle);
-//            float x = cx + hexagonSize * (float) Math.cos(angle);
-//            float angle = (float) (i * 2 * Math.PI / 6); // Angle for each vertex
-//        for (int i = 0; i < 6; i++) {
-//        // Calculate vertex positions
-//    private void drawHexagon(Canvas canvas, float cx, float cy) {
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -225,9 +198,8 @@ public class HexBoard extends View {
             if (clickedHex != null) {
                 int row = clickedHex[0];
                 int col = clickedHex[1];
-//                Toast.makeText(getContext().getApplicationContext(), String.format("You clicked on (%s,%s)", row, col), Toast.LENGTH_SHORT).show();
-                // Handle click on hexagon at row, col
                 gameLogic.act(row, col);
+
                 // invalidate() to redraw the view
                 invalidate();
                 return true;
@@ -238,32 +210,11 @@ public class HexBoard extends View {
     }
 
     private int[] getClickedHexagon(float touchX, float touchY) {
-//        // Calculate the hexagon grid coordinates based on the touch coordinates
-//        float xOffset = (getWidth() - (numColumns * hexagonSize * 2 - hexagonSize)) / 1.75f;
-//        float yOffset = (getHeight() - (numRows * hexagonSize * 1.5f - hexagonSize * 0.5f)) / 2f;
-//
-//        int col = (int) ((touchX - xOffset) / (hexagonSize * 1.6f));
-//        int row = (int) ((touchY - yOffset) / (hexagonSize * 2f));
-//
-//        if (col % 2 != 0) {
-//            // Adjust row for odd columns
-//            row = (int) ((touchY - yOffset - hexagonSize * 0.75f) / (hexagonSize * 1.5f));
-//        }
-//
-//        // Check if the touch coordinates are within the bounds of the hexagon grid
-//        if (row >= 0 && row < numRows && col >= 0 && col < numColumns) {
-//            return new int[]{row, col};
-//        }
-//
-//        return null;
-
-
         // Adjust touch coordinates to account for grid offsets
         float adjustedX = touchX - xOffset;
         float adjustedY = touchY - yOffset;
 
         // Calculate grid coordinates based on the adjusted touch coordinates
-
         int col = Math.round(adjustedX / (hexagonSize * 1.6f)); // Horizontal spacing is 1.6 * hexagonSize
         int row = Math.round(adjustedY / (hexagonSize * 2f)); // Vertical spacing is 2 * hexagonSize
 
@@ -278,27 +229,11 @@ public class HexBoard extends View {
             // Perform further validation if needed based on hexagon geometry
             return new int[]{row, col};
         }
-
         return null; // No hexagon clicked
-
     }
 
-    public static boolean willExceedBoundary(int numRows, int numColumns, float hexagonSize, float dimension) {
-        // Calculate required grid dimensions
-        float gridWidth = numColumns * hexagonSize * 1.5f;
-        float gridHeight = (float) (numRows * hexagonSize * Math.sqrt(3) / 2f);
-
-        // Check if grid dimensions exceed the square view dimensions
-        return gridWidth > dimension || gridHeight > dimension;
+    public void setPlayerNames(String playerOneNameStr, String playerTwoNameStr) {
+        this.playerOneName = playerOneNameStr;
+        this.playerTwoName = playerTwoNameStr;
     }
-
-    //    private int getRequiredColumns(float dimension) {
-//        float sideLength = dimension / (2 * (dimension / dimension) - 1f);
-//        return (int) (dimension / (sideLength * 2)) + 1;
-//    }
-//
-//    private int getRequiredRows(float dimension) {
-//        float sideLength = dimension / (1.5f * (dimension / dimension));
-//        return (int) (dimension / (sideLength * 1.5f)) + 1;
-//    }
 }

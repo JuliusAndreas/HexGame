@@ -26,6 +26,9 @@ public class GameLogic {
     private byte chosenCol = -1;
     private boolean gameOver;
     private Boolean winner = null;
+    private short playerOneScore;
+
+    private short playerTwoScore;
 
     public boolean isGameOver() {
         return gameOver;
@@ -78,6 +81,7 @@ public class GameLogic {
                 return;
             }
             march(row, col);
+            updateScores();
             checkGameOver();
             if (gameOver) {
                 determineWhoWon();
@@ -85,7 +89,15 @@ public class GameLogic {
         }
     }
 
-    private void determineWhoWon() {
+    public short getPlayerOneScore() {
+        return playerOneScore;
+    }
+
+    public short getPlayerTwoScore() {
+        return playerTwoScore;
+    }
+
+    private void updateScores() {
         int playerOneScore = 0;
         int playerTwoScore = 0;
         for (int i = 0; i < numRows; i++) {
@@ -95,6 +107,11 @@ public class GameLogic {
                 } else if (board[i][j] == 3) playerTwoScore++;
             }
         }
+        this.playerOneScore = (short) playerOneScore;
+        this.playerTwoScore = (short) playerTwoScore;
+    }
+
+    private void determineWhoWon() {
         if (playerOneScore > playerTwoScore) {
             this.winner = playerOne;
         } else if (playerOneScore < playerTwoScore) {
@@ -315,5 +332,9 @@ public class GameLogic {
 
     public boolean getPlayerTwo() {
         return playerTwo;
+    }
+
+    public Boolean getWinner() {
+        return winner;
     }
 }
