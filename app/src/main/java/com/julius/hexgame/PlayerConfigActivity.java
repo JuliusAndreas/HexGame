@@ -112,6 +112,7 @@ public class PlayerConfigActivity extends AppCompatActivity {
         intent.putExtra("rows", rows);
         intent.putExtra("columns", columns);
         intent.putExtra("hex_size", hexSize);
+        intent.putExtra("AI", false);
         startActivity(intent);
     }
 

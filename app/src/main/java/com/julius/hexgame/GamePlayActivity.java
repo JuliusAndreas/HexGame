@@ -48,6 +48,7 @@ public class GamePlayActivity extends AppCompatActivity {
         int rows = getIntent().getIntExtra("rows", 5);
         int columns = getIntent().getIntExtra("columns", 5);
         int hexSize = getIntent().getIntExtra("hex_size", 80);
+        boolean isAI = getIntent().getBooleanExtra("AI", false);
         hexBoard.setUpBoard(rows, columns, hexSize);
         String playerOneNameStr = getIntent().getStringExtra("player_one_name");
         String playerTwoNameStr = getIntent().getStringExtra("player_two_name");
@@ -58,6 +59,7 @@ public class GamePlayActivity extends AppCompatActivity {
         hexBoard.setPlayerNames(playerOneNameStr, playerTwoNameStr);
         hexBoard.setElements(txtPlayerOneScore, txtPlayerTwoScore, txtGameState,
                 btnHome, btnPlayAgain, txtPlayerOneName, txtPlayerTwoName);
+        hexBoard.setAI(isAI);
         hexBoard.configureElements();
     }
 

@@ -16,10 +16,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.julius.hexgame.R;
+import com.julius.hexgame.util.AI;
 import com.julius.hexgame.util.GameLogic;
 
 public class HexBoard extends View {
 
+    private com.julius.hexgame.util.AI AI;
     private final int boardColor;
     private final int playerOneColor;
     private final int playerTwoColor;
@@ -51,6 +53,7 @@ public class HexBoard extends View {
     private String playerTwoName;
     private TextView txtPlayerOneName;
     private TextView txtPlayerTwoName;
+    private boolean AIMode = false;
 
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -215,6 +218,8 @@ public class HexBoard extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (AIMode && gameLogic.getTurn() != gameLogic.getPlayerOne())
+            return super.onTouchEvent(event);
         float x = event.getX();
         float y = event.getY();
 
@@ -277,5 +282,16 @@ public class HexBoard extends View {
         btnHome.setVisibility(GONE);
         btnPlayAgain.setVisibility(GONE);
         invalidate();
+    }
+
+    public byte[][] getBoardStatus(){
+        return gameLogic.getBoard().clone();
+    }
+
+    public void setAI(boolean isAI) {
+        this.AIMode = isAI;
+        if (isAI) {
+            this.AI = new AI(this);
+        }
     }
 }

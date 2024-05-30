@@ -22,12 +22,13 @@ public class GameLogic {
         4 for chosen cell
      */
     private byte[][] board;
+
     private byte chosenRow = -1;
+
     private byte chosenCol = -1;
     private boolean gameOver;
     private Boolean winner = null;
     private short playerOneScore;
-
     private short playerTwoScore;
 
     public boolean isGameOver() {
@@ -335,5 +336,9 @@ public class GameLogic {
 
     public Boolean getWinner() {
         return winner;
+    }
+
+    public byte[][] getBoard() {
+        return board;
     }
 }

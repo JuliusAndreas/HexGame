@@ -27,6 +27,8 @@ public class AIConfigActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_aiconfig);
+        configMenuSong = MediaPlayer.create(this, R.raw.amomentspeace);
+        configMenuSong.start();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -102,6 +104,7 @@ public class AIConfigActivity extends AppCompatActivity {
         intent.putExtra("rows", rows);
         intent.putExtra("columns", columns);
         intent.putExtra("hex_size", hexSize);
+        intent.putExtra("AI", true);
         startActivity(intent);
     }
 
