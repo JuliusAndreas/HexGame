@@ -30,8 +30,8 @@ public class HexBoard extends View {
     private final Paint strokePaint = new Paint();
     private final Path path = new Path();
     private short supremum = 5;
-    private int numColumns;
-    private int numRows;
+    private Integer numColumns;
+    private Integer numRows;
     private short hexagonRadius;
     private short oddAreaHexagons;
     private short evenAreaHexagons;
@@ -54,7 +54,6 @@ public class HexBoard extends View {
     private TextView txtPlayerOneName;
     private TextView txtPlayerTwoName;
     private boolean AIMode = false;
-
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray attributesArray = context.getTheme().obtainStyledAttributes(
@@ -285,7 +284,14 @@ public class HexBoard extends View {
     }
 
     public byte[][] getBoardStatus(){
-        return gameLogic.getBoard().clone();
+        byte[][] boardCopy = new byte[gameLogic.getBoard().length][];
+        for(int i = 0; i < gameLogic.getBoard().length; i++) {
+            byte[] aRow = gameLogic.getBoard()[i];
+            int aLength = aRow.length;
+            boardCopy[i] = new byte[aLength];
+            System.arraycopy(aRow, 0, boardCopy[i], 0, aLength);
+        }
+        return boardCopy;
     }
 
     public void setAI(boolean isAI) {
@@ -293,5 +299,13 @@ public class HexBoard extends View {
         if (isAI) {
             this.AI = new AI(this);
         }
+    }
+
+    public int getNumColumns() {
+        return numColumns;
+    }
+
+    public int getNumRows() {
+        return numRows;
     }
 }

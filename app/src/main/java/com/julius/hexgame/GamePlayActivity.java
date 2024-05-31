@@ -59,8 +59,8 @@ public class GamePlayActivity extends AppCompatActivity {
         hexBoard.setPlayerNames(playerOneNameStr, playerTwoNameStr);
         hexBoard.setElements(txtPlayerOneScore, txtPlayerTwoScore, txtGameState,
                 btnHome, btnPlayAgain, txtPlayerOneName, txtPlayerTwoName);
-        hexBoard.setAI(isAI);
         hexBoard.configureElements();
+        hexBoard.setAI(isAI);
     }
 
     public void playAgain(View view) {
