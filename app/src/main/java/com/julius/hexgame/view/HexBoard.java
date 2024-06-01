@@ -54,6 +54,7 @@ public class HexBoard extends View {
     private TextView txtPlayerOneName;
     private TextView txtPlayerTwoName;
     private boolean AIMode = false;
+
     public HexBoard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray attributesArray = context.getTheme().obtainStyledAttributes(
@@ -232,6 +233,10 @@ public class HexBoard extends View {
 
                 // invalidate() to redraw the view
                 invalidate();
+
+                if (AIMode && !gameLogic.isGameOver()) {
+                    AI.think(getBoardStatus());
+                }
                 return true;
             }
         }
@@ -283,15 +288,24 @@ public class HexBoard extends View {
         invalidate();
     }
 
-    public byte[][] getBoardStatus(){
+    public byte[][] getBoardStatus() {
         byte[][] boardCopy = new byte[gameLogic.getBoard().length][];
-        for(int i = 0; i < gameLogic.getBoard().length; i++) {
+        for (int i = 0; i < gameLogic.getBoard().length; i++) {
             byte[] aRow = gameLogic.getBoard()[i];
             int aLength = aRow.length;
             boardCopy[i] = new byte[aLength];
             System.arraycopy(aRow, 0, boardCopy[i], 0, aLength);
         }
         return boardCopy;
+    }
+
+    public void applyAIAction(int chosenRow, int chosenCol, int toRow, int toCol) {
+        if (gameLogic.getTurn() == gameLogic.getPlayerOne()) {
+            return;
+        }
+        gameLogic.act(chosenRow, chosenCol);
+        gameLogic.act(toRow, toCol);
+        invalidate();
     }
 
     public void setAI(boolean isAI) {

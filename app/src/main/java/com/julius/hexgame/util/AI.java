@@ -23,7 +23,11 @@ public class AI {
     private static final int MAX_DEPTH = 5; // Maximum depth
 
     public void think(byte[][] board) {
-        findBestMove(board);
+        Move bestMove = findBestMove(board);
+        if (bestMove != null) {
+            ui.applyAIAction(bestMove.source.first, bestMove.source.second,
+                    bestMove.destination.first, bestMove.destination.second);
+        }
     }
 
     private Move findBestMove(byte[][] board) {
@@ -146,7 +150,7 @@ public class AI {
 
     private boolean isGameOver(byte[][] board) {
         // Implement logic to determine if the game is over
-        return false;
+        return boardIsFull(board) || noPossibleMovesAvailable(board) || noMorePawnsRemain(board);
     }
 
     private int evaluateBoard(byte[][] board) {
@@ -237,6 +241,68 @@ public class AI {
     private boolean validCell(Pair<Integer, Integer> cell) {
         return cell.first < numRows && cell.first >= 0
                 && cell.second < numCols && cell.second >= 0;
+    }
+
+    private boolean noMorePawnsRemain(byte[][] board) {
+        int playerOnePossibleMoves = 0;
+        int playerTwoPossibleMoves = 0;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 2) {
+                    playerOnePossibleMoves++;
+                } else if (board[i][j] == 3) playerTwoPossibleMoves++;
+                if (playerOnePossibleMoves > 0 && playerTwoPossibleMoves > 0) return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean noPossibleMovesAvailable(byte[][] board) {
+        int playerOnePossibleMoves = 0;
+        int playerTwoPossibleMoves = 0;
+        Set<Pair<Integer, Integer>> neighbors;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 1 || board[i][j] == -1) continue;
+                neighbors = neighborsOf(i, j);
+                if (thereIsReplicationMoveAvailable(board, neighbors)
+                        || thereIsJumpMoveAvailable(board, neighbors)) {
+                    if (board[i][j] == 2) {
+                        playerOnePossibleMoves++;
+                    } else if (board[i][j] == 3) playerTwoPossibleMoves++;
+                }
+                if (playerOnePossibleMoves > 0 && playerTwoPossibleMoves > 0) return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean thereIsReplicationMoveAvailable(byte[][] board, Set<Pair<Integer, Integer>> neighbors) {
+        for (Pair<Integer, Integer> neighbor : neighbors) {
+            if (board[neighbor.first][neighbor.second] == 1) return true;
+        }
+        return false;
+    }
+
+    private boolean thereIsJumpMoveAvailable(byte[][] board, Set<Pair<Integer, Integer>> neighbors) {
+        Set<Pair<Integer, Integer>> neighborsOfTheNeighbor;
+        for (Pair<Integer, Integer> neighbor : neighbors) {
+            neighborsOfTheNeighbor = neighborsOf(neighbor.first, neighbor.second);
+            for (Pair<Integer, Integer> neighborOfTheNeighbor : neighborsOfTheNeighbor) {
+                if (board[neighborOfTheNeighbor.first][neighborOfTheNeighbor.second] == 1)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean boardIsFull(byte[][] board) {
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 1) return false;
+            }
+        }
+        return true;
     }
 
     private class Move {
