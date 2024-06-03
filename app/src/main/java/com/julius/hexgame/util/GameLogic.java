@@ -70,7 +70,7 @@ public class GameLogic {
         return board[row][col];
     }
 
-    public void act(int row, int col) {
+    public synchronized void act(int row, int col) {
         if (gameOver) return;
         if (!chosenState) {
             if (!validCellChoice(row, col)) return;

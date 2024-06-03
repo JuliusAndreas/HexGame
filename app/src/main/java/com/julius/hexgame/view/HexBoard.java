@@ -19,8 +19,13 @@ import com.julius.hexgame.R;
 import com.julius.hexgame.util.AI;
 import com.julius.hexgame.util.GameLogic;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class HexBoard extends View {
 
+    private final ExecutorService fixedThreadPool = Executors.newFixedThreadPool(2);
     private com.julius.hexgame.util.AI AI;
     private final int boardColor;
     private final int playerOneColor;
@@ -234,8 +239,9 @@ public class HexBoard extends View {
                 // invalidate() to redraw the view
                 invalidate();
 
-                if (AIMode && !gameLogic.isGameOver()) {
-                    AI.think(getBoardStatus());
+                if (AIMode && !gameLogic.isGameOver() &&
+                        gameLogic.getTurn() == gameLogic.getPlayerTwo()) {
+                    fixedThreadPool.submit(() -> AI.think(getBoardStatus()));
                 }
                 return true;
             }

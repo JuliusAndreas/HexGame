@@ -13,14 +13,13 @@ public class AI {
     private final HexBoard ui;
     private final int numCols;
     private final int numRows;
+    private static final int MAX_DEPTH = 3; // Maximum depth
 
     public AI(HexBoard hexBoard) {
         this.ui = hexBoard;
         this.numRows = hexBoard.getNumRows();
         this.numCols = hexBoard.getNumColumns();
     }
-
-    private static final int MAX_DEPTH = 5; // Maximum depth
 
     public void think(byte[][] board) {
         Move bestMove = findBestMove(board);
@@ -112,9 +111,12 @@ public class AI {
         Set<Pair<Integer, Integer>> neighborsOfTheNeighbor;
         for (Pair<Integer, Integer> neighbor : neighbors) {
             neighborsOfTheNeighbor = neighborsOf(neighbor.first, neighbor.second);
+            neighborsOfTheNeighbor.removeIf(pair -> neighbors.contains(pair) || pair.equals(source));
             for (Pair<Integer, Integer> neighborOfTheNeighbor : neighborsOfTheNeighbor) {
-                if (board[neighborOfTheNeighbor.first][neighborOfTheNeighbor.second] == 1)
-                    possibleMoves.add(new Move(source, neighborOfTheNeighbor));
+                if (board[neighborOfTheNeighbor.first][neighborOfTheNeighbor.second] == 1) {
+                    Move move = new Move(source, neighborOfTheNeighbor);
+                    if (!possibleMoves.contains(move)) possibleMoves.add(move);
+                }
             }
         }
     }
@@ -155,7 +157,13 @@ public class AI {
 
     private int evaluateBoard(byte[][] board) {
         // Implement logic to evaluate the board and return a score
-        return 0;
+        int heuristicValue = 0;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (board[i][j] == 3) heuristicValue++;
+            }
+        }
+        return heuristicValue;
     }
 
     private boolean validReplicationMove(byte[][] newBoard, Set<Pair<Integer, Integer>> neighbors, Move move) {
@@ -207,7 +215,7 @@ public class AI {
             for (int j = -1; j <= 1; j++) {
                 if (neighborShouldNotBeGenerated(i, j, col % 2 == 0)) continue;
                 Pair<Integer, Integer> neighbor = Pair.create(row + i, col + j);
-                if (validCell(neighbor)) {
+                if (validCell(neighbor) && (neighbor.first != row || neighbor.second != col)) {
                     neighbors.add(neighbor);
                 }
             }
@@ -312,6 +320,24 @@ public class AI {
         public Move(Pair<Integer, Integer> source, Pair<Integer, Integer> destination) {
             this.source = source;
             this.destination = destination;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Move move = (Move) o;
+
+            if (!source.equals(move.source)) return false;
+            return destination.equals(move.destination);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = source.hashCode();
+            result = 31 * result + destination.hashCode();
+            return result;
         }
     }
 }
