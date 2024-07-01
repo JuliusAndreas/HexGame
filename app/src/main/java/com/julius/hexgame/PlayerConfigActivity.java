@@ -96,6 +96,13 @@ public class PlayerConfigActivity extends AppCompatActivity {
                     .show();
             return;
         }
+        if (invalidDimensions(rows, columns)) {
+            Toast.makeText(this,
+                            "Dimensions are not large enough to play the game",
+                            Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
         Object[] validationResults = validateDimensions(rows, columns);
         if (!(Boolean) validationResults[0]) {
             Toast.makeText(this,
@@ -131,5 +138,9 @@ public class PlayerConfigActivity extends AppCompatActivity {
         } else {
             return new Object[]{true, hexSize};
         }
+    }
+
+    private boolean invalidDimensions(int rows, int columns) {
+        return rows * columns <= 2;
     }
 }

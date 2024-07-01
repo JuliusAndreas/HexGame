@@ -36,10 +36,14 @@ public class GameLogic {
     }
 
     public GameLogic(int numRows, int numCols) {
+        playerOneScore = 1;
+        playerTwoScore = 1;
         this.setRowsAndCols(numRows, numCols);
     }
 
     public GameLogic() {
+        playerOneScore = 1;
+        playerTwoScore = 1;
     }
 
     public void setRowsAndCols(int rows, int cols) {
