@@ -1,13 +1,10 @@
 package com.julius.hexgame;
 
-import static java.security.AccessController.getContext;
-
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowMetrics;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,7 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.io.IOException;
+import com.julius.hexgame.util.ValidationUtil;
 
 public class PlayerConfigActivity extends AppCompatActivity {
     MediaPlayer configMenuSong;
@@ -96,19 +93,12 @@ public class PlayerConfigActivity extends AppCompatActivity {
                     .show();
             return;
         }
-        if (invalidDimensions(rows, columns)) {
-            Toast.makeText(this,
-                            "Dimensions are not large enough to play the game",
-                            Toast.LENGTH_SHORT)
-                    .show();
-            return;
-        }
-        Object[] validationResults = validateDimensions(rows, columns);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dimension = Math.min(displayMetrics.heightPixels, displayMetrics.widthPixels);
+        Object[] validationResults = ValidationUtil.validateDimensions(
+                this, rows, columns, dimension);
         if (!(Boolean) validationResults[0]) {
-            Toast.makeText(this,
-                            "The dimensions are too large",
-                            Toast.LENGTH_SHORT)
-                    .show();
             return;
         } else {
             hexSize = (Integer) validationResults[1];
@@ -123,24 +113,5 @@ public class PlayerConfigActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private Object[] validateDimensions(int rows, int columns) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int dimension = Math.min(displayMetrics.heightPixels, displayMetrics.widthPixels);
-        int hexSize = 80;
-        while ((((columns) * hexSize * 1.6f) > dimension)
-                || (((rows) * hexSize * 2f) > dimension)) {
-            hexSize -= 10;
-            if (hexSize < 50) break;
-        }
-        if (hexSize < 50) {
-            return new Object[]{false, 0};
-        } else {
-            return new Object[]{true, hexSize};
-        }
-    }
 
-    private boolean invalidDimensions(int rows, int columns) {
-        return rows * columns <= 2;
-    }
 }
